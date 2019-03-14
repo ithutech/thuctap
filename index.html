@@ -1,0 +1,195 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>Thông tin thực tập - Khoa CNTT - Hutech</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <meta charset="utf-8">
+    <style>
+        :root {
+            --accent: #F18260;
+            --purple: #252431;
+        }
+        .form-container {
+            position: relative;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 350px;
+            min-height: 300px;
+            margin: 0 auto;
+            box-shadow: 0 10px 50px 0 #ccc;
+            margin-bottom: 2rem;
+        }
+
+
+
+        .is-hidden {
+            display: none !important;
+        }
+
+        a {
+            display: block;
+            width: max-content;
+            margin: 0 auto;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dasharray: 1,200;
+                stroke-dashoffset: 0;
+            }
+
+            50% {
+                stroke-dasharray: 89,200;
+                stroke-dashoffset: -35;
+            }
+
+            100% {
+                stroke-dasharray: 89,200;
+                stroke-dashoffset: -124;
+            }
+        }
+
+        .loading {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+        }
+
+            .loading-spinner svg {
+                position: relative;
+                animation: rotate 2s linear infinite;
+                height: 50px;
+                width: 50px;
+            }
+
+            .loading-spinner circle {
+                stroke: var(--accent);
+                stroke-dasharray: 1,200;
+                stroke-dashoffset: 0;
+                stroke-linecap: round;
+                animation: dash 1.5s ease-in-out infinite;
+            }
+
+        p.js-success-message {
+            text-align: center;
+            font-size: 20px;
+            padding:10px 0px;
+        }
+
+        table.dtable th, table.dtable td, table.ntable th, table.ntable td {
+            border: 1px #ccc solid;
+            border-collapse: collapse;
+            padding: 5px;
+            font-weight: normal;
+        }
+
+        TABLE {
+            margin-bottom: 5px;
+        }
+
+        table.dtable, table.ntable {
+            border: 1px #ccc solid;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+
+        TH {
+            background: #E0E0E0;
+            font-style: normal;
+        }
+
+        TD {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+
+    </style>
+    <script src="./jquery-3.3.1.min.js"></script>
+    <script src="./jquery-google-sheet-to-json.min.js"></script>
+</head>
+<body>
+    <div id="container">
+        <h1 style="text-align:center">TRA CỨU THÔNG TIN HƯỚNG DẪN ĐỒ ÁN - THỰC TẬP </h1>
+        <h3 style="text-align:center">KHOA CNTT - ĐẠI HỌC HUTECH</h3>
+        <form name="submit-GV">
+            <h3>DÀNH CHO GIẢNG VIÊN</h3>
+            <div class="form-wrapper">
+                <label for="">Email</label>
+                <input type="email" name="txtGVEmail" placeholder="Địa chỉ thư điện tử?" class="form-control" required="" oninvalid="this.setCustomValidity('Nhập Email')" oninput="setCustomValidity('')">
+            </div>
+            <button type="button" onclick="stepGetGiangVien(); return false;">TRA CỨU DANH SÁCH HƯỚNG DẪN</button>
+        </form>
+        <div id="InfoGV" style="padding: 10px">
+        </div>
+
+        <div class="loading js-loading is-hidden">
+            <div class="loading-spinner">
+                <svg><circle cx="25" cy="25" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" /></svg>
+            </div>
+        </div>
+
+        <form name="submit-GV">
+            <h3>DÀNH CHO SINH VIÊN</h3>
+            <div class="form-wrapper">
+                <label for="txtMaSV">MASV</label>
+                <input type="text" name="txtMaSV" placeholder="Mã số sinh viên" class="form-control" required="" oninvalid="this.setCustomValidity('Nhập Mã SV')" oninput="setCustomValidity('')">
+            </div>
+            <button type="button" onclick="stepGetSinhVien(); return false;">TRA CỨU THÔNG TIN HƯỚNG DẪN</button>
+        </form>
+        <div id="InfoSV" style="padding: 10px">
+        </div>
+        <div id="SVUpdate">
+        </div>
+
+        <form name="submit-to-google-sheet">
+            <h3>SINH VIÊN CẬP NHẬT THÔNG TIN</h3>
+            <div class="form-wrapper">
+                <label for="">Email</label>
+                <input type="email" name="EMAIL" placeholder="Địa chỉ thư điện tử?" class="form-control" required="" oninvalid="this.setCustomValidity('Nhập Email')" oninput="setCustomValidity('')">
+            </div>
+            <div class="form-wrapper">
+                <label for="">Điện Thoại</label>
+                <input type="text" name="DIENTHOAI" placeholder="Hãy giữ liên lạc?" class="form-control" required="" oninvalid="this.setCustomValidity('Nhập số điện thoại')" oninput="setCustomValidity('')">
+            </div>
+            <input type="text" hidden name="MASV">
+            <button type="submit">CẬP NHẬT</button>
+        </form>
+        <p class="js-success-message is-hidden" style="color:red">CẬP NHẬT THÀNH CÔNG</p>
+        <p class="js-error-message is-hidden">AHAHA - LỖI RỒI</p>
+        <script type="text/javascript" src="./do_get_info.js">
+        </script>
+        <script src="./prefixfree.min.js"></script>
+        <script src="./formdata-poly.js"></script>
+        <script src="./promise-polyfill.js"></script>
+        <script src="./whatwg-fetch.js"></script>
+        <h1 style="text-align:center">Khoa CNTT - Trường ĐH Hutech</h1>
+        <p style="text-align:center">&copy; 2019 Nguyễn Đình Ánh - nd.anh@hutech.edu.vn<p>
+    </div>
+</body>
+</html>
